@@ -11,21 +11,29 @@ import {
 import { CreateEventDto } from './create-event.dto';
 import { UpdateEventDto } from './update-event.dto';
 import { Event } from './event.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 //Data Transfer Object
 @Controller('/events')
 export class EventsController {
+  constructor(
+    @InjectRepository(Event)
+    private readonly repository: Repository<Event>,
+  ) {}
   private events: Event[] = [];
 
   @Get()
   findAll() {
-    return this.events;
+    return this.repository.find;
   }
 
   @Get(':id')
-  findOne(@Param('id') id) {
-    console.log(id);
-    return this.events.find((event) => event.id === parseInt(id));
+  async findOne(@Param('id') id) {
+    const data = await this.repository.find({
+      where: { id: id },
+    });
+    return data;
   }
 
   @Post()
